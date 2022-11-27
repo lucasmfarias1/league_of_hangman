@@ -3,6 +3,16 @@
   <%= session[:beat_ids].size %>/648 abilities guessed correctly
 </div>
 
+<pre>
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+</pre>
+
 <div id="tips-box" style="display: none">
   <%= @spell.champion %>'s <%= @spell.key %><br>
   Cooldowns: <%= @spell.cooldown %><br>
@@ -60,7 +70,9 @@ Letters already guessed:
     lettersGuessed: [],
     spellsGuessed: [],
     correctGuesses: 0,
-    won: false
+    incorrectGuesses: 0,
+    won: false,
+    defeat: false
   }
 
   function toggleTips() {
@@ -79,12 +91,14 @@ Letters already guessed:
       document.querySelectorAll(`[data-letter="${character}"]`).forEach((element) => {
         element.setHTML(character);
       });
+    } else {
+      state.incorrectGuesses += 1;
+      updateHangman();
+      checkForDefeat();
     }
   }
 
   function checkForWin() {
-    console.log(uniqueCharacters.length);
-    console.log(state.correctGuesses);
     if (state.correctGuesses >= uniqueCharacters.length) {
       $("#win_form")[0].requestSubmit();
       document.querySelector('#win-box').setHTML("You got it! Press enter to play again.");
@@ -94,9 +108,93 @@ Letters already guessed:
     }
   }
 
+  function checkForDefeat() {
+    if (state.incorrectGuesses >= 6) {
+      document.querySelector('#win-box').setHTML("You lost! Press enter to play again.");
+      $("#play-again-box").show();
+      $("#guess_form").hide();
+      state.defeat = true;
+    }
+  }
+
+  function updateHangman() {
+    switch (state.incorrectGuesses) {
+    case 1:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========
+      `)
+      break;
+    case 2:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========
+      `)
+      break;
+    case 3:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+ /|   |
+      |
+      |
+=========
+      `)
+      break;
+    case 4:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+ /|\\  |
+      |
+      |
+=========
+      `)
+      break;
+    case 5:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+ /|\\  |
+ /    |
+      |
+=========
+      `)
+      break;
+    case 6:
+      $('pre').html(`
+  +---+
+  |   |
+  O   |
+ /|\\  |
+ / \\  |
+      |
+=========
+      `)
+      break;
+    }
+  }
+
   document.addEventListener("keyup", (event) => {
-    if (state.won && event.keyCode == 13) {
+    if ((state.won || state.defeat) && event.keyCode == 13) {
       return location.reload();
+    }
+
+    if (state.won || state.defeat) {
+      return;
     }
 
     if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)) {
