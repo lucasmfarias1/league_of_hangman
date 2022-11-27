@@ -13,7 +13,7 @@ class GuessesController < ApplicationController
 
   def win
     session[:beat_ids] << params[:spell_id]
-    render :win
+    head :ok
   end
 
   private
