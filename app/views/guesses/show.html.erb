@@ -8,7 +8,7 @@
 <hr>
 
 <% @spell.name.split('').each.with_index do |letter, i| %>
-  <% if letter.match?(/[[:alpha:]]/) %>
+  <% if letter.match?(/[[:alnum:]]/) %>
     <span id='letter_<%= i %>' data-letter='<%= letter.upcase %>'>_ </span>
   <% else %>
     <span id='letter_<%= i %>' style="margin: 0 6px"> </span>
@@ -30,14 +30,30 @@ Already guessed:
     id: :guess_input
   %>
 <% end %>
+
+<%= form_with url: guesses_path, remote: true, id: :win_form do |f| %>
+  <%=
+    f.hidden_field :spell_id,
+    id: :guess_input,
+    value: @spell.id
+  %>
+<% end %>
+
 <div id="win-box"></div>
 <div id="play-again-box" style="display: none;">
   <button onclick="window.location.reload();">Play Again</button>
 </div>
 
 <script type="text/javascript">
+  const currentSpell = "<%= raw @spell.name %>";
+  const uniqueCharacters = String.prototype
+                                 .concat(...new Set(currentSpell.toUpperCase()))
+                                 .replace(/[^a-z0-9]/gi, '');
   let state = {
-    guessed: []
+    lettersGuessed: [],
+    spellsGuessed: [],
+    correctGuesses: 0,
+    won: false
   }
 
   function toggleTips() {
@@ -50,13 +66,41 @@ Already guessed:
     }
   }
 
+  function fillLetters(character) {
+    if (uniqueCharacters.includes(character)) {
+      state.correctGuesses += 1;
+      document.querySelectorAll(`[data-letter="${character}"]`).forEach((element) => {
+        element.setHTML(character);
+      });
+    }
+  }
+
+  function checkForWin() {
+    console.log(uniqueCharacters.length);
+    console.log(state.correctGuesses);
+    if (state.correctGuesses >= uniqueCharacters.length) {
+      $("#win_form")[0].requestSubmit();
+      document.querySelector('#win-box').setHTML("You got it! Press enter to play again.");
+      $("#play-again-box").show();
+      $("#guess_form").hide();
+      state.won = true;
+    }
+  }
+
   document.addEventListener("keyup", (event) => {
+    if (state.won && event.keyCode == 13) {
+      return location.reload();
+    }
+
     if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)) {
-      let character = String.fromCharCode(event.keyCode)
-      $("#guess_input").val(character);
-      $("#guess_form")[0].requestSubmit();
-      state.guessed.push(character);
-      $('#guessed_box').append(character + ", ");
+      let character = String.fromCharCode(event.keyCode).toUpperCase();
+      if (!state.lettersGuessed.includes(character)) {
+        $("#guess_input").val(character);
+        fillLetters(character);
+        state.lettersGuessed.push(character);
+        $('#guessed_box').append(character + " ");
+        checkForWin();
+      }
     }
   })
 
