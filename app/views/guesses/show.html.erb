@@ -1,0 +1,68 @@
+<div id="tips-box" style="display: none">
+  <%= @spell.champion %>'s <%= @spell.key %><br>
+  Cooldowns: <%= @spell.cooldown %><br>
+  Costs: <%= @spell.cost %>
+</div>
+<button onclick="toggleTips()">Toggle Tips</button>
+
+<hr>
+
+<% @spell.name.split('').each.with_index do |letter, i| %>
+  <% if letter.match?(/[[:alpha:]]/) %>
+    <span id='letter_<%= i %>' data-letter='<%= letter.upcase %>'>_ </span>
+  <% else %>
+    <span id='letter_<%= i %>' style="margin: 0 6px"> </span>
+  <% end %>
+<% end %>
+
+<hr>
+
+Already guessed:
+<div id="guessed_box">
+</div>
+
+<hr>
+
+<%= form_with url: guesses_path, remote: true, id: :guess_form do |f| %>
+  <%= f.label :guess, 'Type any letter to make a guess'%>
+  <%=
+    f.hidden_field :guess,
+    id: :guess_input
+  %>
+<% end %>
+<div id="win-box"></div>
+<div id="play-again-box" style="display: none;">
+  <button onclick="window.location.reload();">Play Again</button>
+</div>
+
+<script type="text/javascript">
+  let state = {
+    guessed: []
+  }
+
+  function toggleTips() {
+    if (localStorage.showTips == "false") {
+      localStorage.showTips = 'true';
+      $("#tips-box").show();
+    } else {
+      localStorage.showTips = 'false';
+      $("#tips-box").hide();
+    }
+  }
+
+  document.addEventListener("keyup", (event) => {
+    if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)) {
+      let character = String.fromCharCode(event.keyCode)
+      $("#guess_input").val(character);
+      $("#guess_form")[0].requestSubmit();
+      state.guessed.push(character);
+      $('#guessed_box').append(character + ", ");
+    }
+  })
+
+  if (localStorage.showTips == "false") {
+    $("#tips-box").hide();
+  } else {
+    $("#tips-box").show();
+  }
+</script>

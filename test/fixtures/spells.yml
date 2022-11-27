@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  champion: MyString
+  name: MyString
+  cooldown: MyString
+  cost: MyString
+  resource: MyString
+
+two:
+  champion: MyString
+  name: MyString
+  cooldown: MyString
+  cost: MyString
+  resource: MyString
