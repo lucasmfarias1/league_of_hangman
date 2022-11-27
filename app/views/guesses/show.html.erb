@@ -1,3 +1,8 @@
+
+<div class="container small mb-3">
+  <%= session[:beat_ids].size %>/648 abilities guessed correctly
+</div>
+
 <div id="tips-box" style="display: none">
   <%= @spell.champion %>'s <%= @spell.key %><br>
   Cooldowns: <%= @spell.cooldown %><br>
@@ -7,6 +12,7 @@
 
 <hr>
 
+<div class="container">
 <% @spell.name.split('').each.with_index do |letter, i| %>
   <% if letter.match?(/[[:alnum:]]/) %>
     <span id='letter_<%= i %>' data-letter='<%= letter.upcase %>'>_ </span>
@@ -14,10 +20,11 @@
     <span id='letter_<%= i %>' style="margin: 0 6px"> </span>
   <% end %>
 <% end %>
+</div>
 
 <hr>
 
-Already guessed:
+Letters already guessed:
 <div id="guessed_box">
 </div>
 
