@@ -41,7 +41,8 @@ Letters already guessed:
 <hr>
 
 <%= form_with url: guesses_path, remote: true, id: :guess_form do |f| %>
-  <%= f.label :guess, 'Type any letter to make a guess'%>
+  <%= f.label :guess, 'Type any letter to make a guess' %><br>
+  <%= f.text_field :guess, maxlength: 0, autocomplete: :off %>
   <%=
     f.hidden_field :guess,
     id: :guess_input
@@ -93,6 +94,7 @@ Letters already guessed:
       });
     } else {
       state.incorrectGuesses += 1;
+      $('#guessed_box').append(character + " ");
       updateHangman();
       checkForDefeat();
     }
@@ -203,7 +205,6 @@ Letters already guessed:
         $("#guess_input").val(character);
         fillLetters(character);
         state.lettersGuessed.push(character);
-        $('#guessed_box').append(character + " ");
         checkForWin();
       }
     }
