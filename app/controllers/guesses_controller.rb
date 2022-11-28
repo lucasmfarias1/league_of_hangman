@@ -2,11 +2,12 @@ class GuessesController < ApplicationController
   include ActionView::Helpers::DateHelper
 
   def show
+    session[:beat_ids] ||= []
+    session[:start_time] ||= Time.now
+
     render_game_over if session[:beat_ids].count >= 648 #Spell.count
 
     set_spell
-    session[:start_time] ||= Time.now
-    session[:beat_ids] ||= []
     session[:spellname] = @spell.name.upcase
     session[:spell_id] = @spell.id
   end
