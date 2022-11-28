@@ -42,7 +42,7 @@ Letters already guessed:
 
 <%= form_with url: guesses_path, remote: true, id: :guess_form do |f| %>
   <%= f.label :guess, 'Type any letter to make a guess' %><br>
-  <%= f.text_field :guess, maxlength: 0, autocomplete: :off %>
+  <%= f.text_field :guess, id: :guess_input, maxlength: 1, autocomplete: :off %>
   <%=
     f.hidden_field :guess,
     id: :guess_input
@@ -190,8 +190,11 @@ Letters already guessed:
     }
   }
 
-  document.addEventListener("keyup", (event) => {
-    if ((state.won || state.defeat) && event.keyCode == 13) {
+  function processKeyPress (event) {
+    let keyCodePressed = event.keyCode == undefined ? $('#guess_input').val().charCodeAt(0) : event.keyCode;
+    $('#guess_input').val('');
+
+    if ((state.won || state.defeat) && keyCodePressed == 13) {
       return location.reload();
     }
 
@@ -199,16 +202,18 @@ Letters already guessed:
       return;
     }
 
-    if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90)) {
-      let character = String.fromCharCode(event.keyCode).toUpperCase();
+    if ((keyCodePressed >= 48 && keyCodePressed <= 57) || (keyCodePressed >= 65 && keyCodePressed <= 90)) {
+      let character = String.fromCharCode(keyCodePressed).toUpperCase();
       if (!state.lettersGuessed.includes(character)) {
-        $("#guess_input").val(character);
         fillLetters(character);
         state.lettersGuessed.push(character);
         checkForWin();
       }
     }
-  })
+  }
+
+  document.addEventListener("keyup", (event) => processKeyPress(event))
+  $('#guess_input').on("input", (event) => processKeyPress(event))
 
   if (localStorage.showTips == "false") {
     $("#tips-box").hide();
