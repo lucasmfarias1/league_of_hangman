@@ -11,8 +11,8 @@ champion_names.each do |name|
     Spell.create(
       champion: name,
       name: spell['name'],
-      cooldown: spell['cooldown'],
-      cost: spell['cost'],
+      cooldown: spell['cooldown'].join('/'),
+      cost: spell['cost'].join('/'),
       key: ['Q', 'W', 'E', 'R'][i]
     )
   end

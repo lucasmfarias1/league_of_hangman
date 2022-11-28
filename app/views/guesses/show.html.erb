@@ -15,8 +15,8 @@
 
 <div id="tips-box" style="display: none">
   <%= @spell.champion %>'s <%= @spell.key %><br>
-  Cooldowns: <%= @spell.cooldown %><br>
-  Costs: <%= @spell.cost %>
+  Cooldowns: <span class="fw-normal"><%= @spell.cooldown %></span><br>
+  Costs: <span class="fw-normal"><%= @spell.cost %></span><br>
 </div>
 <button onclick="toggleTips()">Toggle Tips</button>
 

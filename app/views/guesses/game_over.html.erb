@@ -1,0 +1,26 @@
+<div class="container small mb-3">
+  <%= session[:beat_ids].size %>/648 abilities guessed correctly
+</div>
+
+<div class="container small mb-3">
+  Congratulations! You managed to get every ability right!<br>
+  It took you <%= @time_to_complete %> to do it.
+</div>
+
+<div class="container small mb-3">
+  <%= link_to 'Click here to reset the game and play again.', reset_path %>
+</div>
+
+<script>
+  function processKeyPress (event) {
+    let keyCodePressed = event.keyCode == undefined ? $('#guess_input').val().charCodeAt(0) : event.keyCode;
+    $('#guess_input').val('');
+
+    if (keyCodePressed == 13) {
+      return location.reload();
+    }
+  }
+
+  document.addEventListener("keyup", (event) => processKeyPress(event))
+  $('#guess_input').on("input", (event) => processKeyPress(event))
+</script>
