@@ -1,26 +1,26 @@
 class GuessesController < ApplicationController
   include ActionView::Helpers::DateHelper
 
+  before_action :set_player
+
   def show
-    session[:beat_ids] ||= []
     session[:start_time] ||= Time.now
 
-    render_game_over if session[:beat_ids].count >= 648 #Spell.count
+    return render_game_over if @player.beat_spells.count >= 648
 
     set_spell
-    session[:spellname] = @spell.name.upcase
-    session[:spell_id] = @spell.id
   end
 
   def win
-    session[:beat_ids] << params[:spell_id]
+    BeatSpell.create(spell_id: params[:spell_id], player: @player)
     head :ok
   end
 
   def reset
-    session[:beat_ids] = []
+    @player.beat_spells.destroy_all
     session[:start_time] = Time.now
     session.delete(:end_time)
+    session.delete(:beat_ids)
 
     redirect_to guesses_path
   end
@@ -29,7 +29,7 @@ class GuessesController < ApplicationController
 
   def set_spell
     @spell = Spell.where(
-      id: Spell.where.not(id: session[:beat_ids])
+      id: Spell.where.not(id: @player.beat_spells.pluck(:spell_id))
                .pluck(:id).sample
     ).first
   end
@@ -38,5 +38,10 @@ class GuessesController < ApplicationController
     session[:end_time] ||= Time.now
     @time_to_complete = distance_of_time_in_words(session[:start_time], session[:end_time])
     render :game_over
+  end
+
+  def set_player
+    @player = Player.find_by(id: session[:player_id]) || Player.create
+    session[:player_id] = @player.id
   end
 end

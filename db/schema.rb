@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_26_181940) do
+ActiveRecord::Schema.define(version: 2022_11_28_212845) do
+
+  create_table "beat_spells", force: :cascade do |t|
+    t.integer "spell_id", null: false
+    t.integer "player_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["player_id"], name: "index_beat_spells_on_player_id"
+    t.index ["spell_id"], name: "index_beat_spells_on_spell_id"
+  end
+
+  create_table "players", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "spells", force: :cascade do |t|
     t.string "champion"
@@ -22,4 +36,6 @@ ActiveRecord::Schema.define(version: 2022_11_26_181940) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "beat_spells", "players"
+  add_foreign_key "beat_spells", "spells"
 end
